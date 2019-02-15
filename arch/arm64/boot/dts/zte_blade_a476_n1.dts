@@ -33,30 +33,6 @@ memory@00000000 {
 		data = <2>;
 		pwm_config = <0 0 0 0 0>;
 	};
-		led2:led@2 {
-		compatible = "mediatek,blue";
-		led_mode = <0>;
-		data = <1>;
-		pwm_config = <0 0 0 0 0>;
-	};
-	led3:led@3 {
-		compatible = "mediatek,jogball-backlight";
-		led_mode = <0>;
-		data = <1>;
-		pwm_config = <0 0 0 0 0>;
-	};
-	led4:led@4 {
-		compatible = "mediatek,keyboard-backlight";
-		led_mode = <0>;
-		data = <1>;
-		pwm_config = <0 0 0 0 0>;
-	};
-	led5:led@5 {
-		compatible = "mediatek,button-backlight";
-		led_mode = <0>; /*gpio mode 2 gpio-60*/
-		data = <60>;
-		pwm_config = <0 0 0 0 0>;
-	};
 	led6:led@6 {
 		compatible = "mediatek,lcd-backlight";
 		led_mode = <5>;
