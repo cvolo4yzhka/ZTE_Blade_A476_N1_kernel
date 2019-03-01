@@ -21,17 +21,10 @@
 #include "cust_mag.h"
 #include "akm09911.h"
 #include "mag.h"
-/*test
-#include <linux/gpio.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
-#include <linux/of_device.h>
-#include <linux/of_gpio.h>
-#include <linux/of_irq.h>*/
-/*test*/
+/*fix mag init*/
 #include <mt-plat/mt_gpio.h>
 #include <mach/gpio_const.h>
-/*test end*/
+/*end fix mag init*/
 
 #define DEBUG 0
 #define AKM09911_DEV_NAME	"akm09911"
@@ -2747,7 +2740,7 @@ static int akm09911_i2c_probe(struct i2c_client *client, const struct i2c_device
 	struct mag_control_path ctl = {0};
 	struct mag_data_path mag_data = {0};
 	
-/*test mag */	
+/*fix mag init */	
 	mt_set_gpio_mode(GPIO61,GPIO_MODE_00); //GPIO_MSE_EINT_PIN
 	mt_set_gpio_dir(GPIO61,GPIO_DIR_OUT);
 	mt_set_gpio_out(GPIO61,GPIO_OUT_ONE);
@@ -2763,7 +2756,7 @@ static int akm09911_i2c_probe(struct i2c_client *client, const struct i2c_device
 	mt_set_gpio_mode(GPIO64,GPIO_MODE_00); //GPIO64 - GPIO_CMMB_RST_PIN
 	mt_set_gpio_dir(GPIO64,GPIO_DIR_OUT);
 	mt_set_gpio_out(GPIO64,GPIO_OUT_ZERO);
-/*test end*/
+/*fix mag init end*/
 
 	MAGN_LOG("akm09911_i2c_probe\n");
 	data = kzalloc(sizeof(struct akm09911_i2c_data), GFP_KERNEL);
