@@ -41,6 +41,10 @@
 #include "leds_drv.h"
 #include <mt-plat/mt_pwm.h>
 
+//GPIO MODE Button-backlight
+#include <asm-generic/gpio.h> 
+//GPIO MODE Button-backlight
+
 #ifdef CONFIG_BACKLIGHT_SUPPORT_LP8557
 #include <linux/of_gpio.h>
 #include <linux/gpio.h>
@@ -654,7 +658,17 @@ static int mt65xx_leds_probe(struct platform_device *pdev)
 			g_leds_data[i] = NULL;
 			continue;
 		}
-
+		//GPIO MODE Button-backlight
+		if(cust_led_list[i].mode == MT65XX_LED_MODE_GPIO) {
+			if(!gpio_is_valid(cust_led_list[i].data)) {
+				g_leds_data[i] = NULL;
+				continue;
+			}
+			gpio_direction_output(cust_led_list[i].data, 1);
+			gpio_request(cust_led_list[i].data, cust_led_list[i].name);
+			gpio_export(cust_led_list[i].data, false);
+		}
+		//GPIO MODE Button-backlight
 		g_leds_data[i] =
 		    kzalloc(sizeof(struct mt65xx_led_data), GFP_KERNEL);
 		if (!g_leds_data[i]) {

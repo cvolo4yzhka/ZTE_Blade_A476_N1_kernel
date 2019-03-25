@@ -32,6 +32,31 @@ memory@00000000 {
 		data = <2>;
 		pwm_config = <0 0 0 0 0>;
 	};
+	led2:led@2 {
+		compatible = "mediatek,blue";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led3:led@3 {
+		compatible = "mediatek,jogball-backlight";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led4:led@4 {
+		compatible = "mediatek,keyboard-backlight";
+		led_mode = <0>;
+		data = <1>;
+		pwm_config = <0 0 0 0 0>;
+	};
+	led5:led@5 {
+		compatible = "mediatek,button-backlight";
+		led_mode = <2>; //fix set to 2 - gpio mode
+		data = <60>; //gpio number
+		gpio = <&pio 60 0>; //gpio number
+		pwm_config = <0 0 0 0 0>;
+	};
 	led6:led@6 {
 		compatible = "mediatek,lcd-backlight";
 		led_mode = <5>;
@@ -44,6 +69,7 @@ memory@00000000 {
 		vib_limit = <9>;
 		vib_vol= <5>;
 	};
+
  /* sensor standardization */
  		cust_accel@0 {
 		compatible = "mediatek,lis3dh";

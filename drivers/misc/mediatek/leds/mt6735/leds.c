@@ -35,6 +35,10 @@
 #include <mach/upmu_sw.h>
 #include <mach/upmu_hw.h>*/
 
+//GPIO MODE Button-backlight
+#include <linux/of_gpio.h>
+//GPIO MODE Button-backlight
+
 #ifdef CONFIG_MTK_AAL_SUPPORT
 #include <ddp_aal.h>
 /* #include <linux/aee.h> */
@@ -271,8 +275,27 @@ struct cust_mt65xx_led *get_cust_led_dtsi(void)
 					LEDS_DEBUG
 					    ("kernel:the backlight hw mode is BLS.\n");
 					break;
+//GPIO MODE Button-backlight
+				case MT65XX_LED_MODE_GPIO:
+					ret = of_get_named_gpio(led_node, "gpio", 0);
+					pr_info("led gpio %d\n", ret);
+					if(gpio_is_valid(ret)) {
+						pled_dtsi[i].data = ret;
+						LEDS_DEBUG
+						    ("The %s's led gpio is : %ld\n",
+						     pled_dtsi[i].name,
+						     pled_dtsi[i].data);
+					} else {
+						LEDS_DEBUG
+						    ("gpio is invalid The %s's led gpio is : %ld\n",
+						     pled_dtsi[i].name,
+						     pled_dtsi[i].data);
+					}
+					break;				
+//GPIO MODE Button-backlight
 				default:
 					break;
+					
 				}
 			}
 		}
@@ -791,6 +814,15 @@ int mt_brightness_set_pmic_duty_store(u32 level, u32 div)
 	return -1;
 }
 
+//GPIO MODE Button-backlight
+void zte_gpio_leds_set_level(struct cust_mt65xx_led *cust, int level)
+{
+	if(cust->mode == MT65XX_LED_MODE_GPIO) {
+		gpio_set_value(cust->data, (level!=0? 1: 0));
+	}
+}
+//GPIO MODE Button-backlight
+
 int mt_mt65xx_led_set_cust(struct cust_mt65xx_led *cust, int level)
 {
 	struct nled_setting led_tmp_setting = { 0, 0, 0 };
@@ -836,7 +868,11 @@ int mt_mt65xx_led_set_cust(struct cust_mt65xx_led *cust, int level)
 
 	case MT65XX_LED_MODE_GPIO:
 		LEDS_DEBUG("brightness_set_cust:go GPIO mode!!!!!\n");
-		return ((cust_set_brightness) (cust->data)) (level);
+//GPIO MODE Button-backlight		
+		//return ((cust_set_brightness) (cust->data)) (level);
+		zte_gpio_leds_set_level(cust, level);
+		return 1;
+//GPIO MODE Button-backlight		
 
 	case MT65XX_LED_MODE_PMIC:
 		/* for button baclight used SINK channel, when set button ISINK,
