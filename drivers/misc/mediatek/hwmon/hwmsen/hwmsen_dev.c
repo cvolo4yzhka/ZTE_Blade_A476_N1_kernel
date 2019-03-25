@@ -1603,7 +1603,7 @@ EXPORT_SYMBOL_GPL(hwmsen_gsensor_add);
 
 int hwmsen_alsps_sensor_remove(struct platform_device *pdev)
 {
-	int err = 0;
+//	int err = 0;
 	int i = 0;
 
 	for (i = 0; i < MAX_CHOOSE_G_NUM; i++) {

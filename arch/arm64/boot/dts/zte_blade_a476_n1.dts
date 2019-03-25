@@ -19,7 +19,6 @@ memory@00000000 {
 			compatible = "mediatek,MTKFB";
 			reg = <0x7F000000 0x1000000>;
 		};
-
 	};
 	led0:led@0 {
 		compatible = "mediatek,red";
@@ -58,7 +57,7 @@ memory@00000000 {
 		};
 		
 		cust_alsps@0 {
-		compatible = "mediatek,tmd2771";
+		compatible = "mediatek,TMD2771";
 		i2c_num	= <2>;
 		i2c_addr = <0x39 0 0 0>;
 		polling_mode_ps = <0>;
@@ -83,7 +82,31 @@ memory@00000000 {
 		is_batch_supported			= <0>;
 		};
 };
+/* sensor gpio standization */
+&pio {
+	alsps_intpin_cfg: alspspincfg {
 
+	    pins_cmd_dat {
+			pins = <PINMUX_GPIO9__FUNC_GPIO9>;
+			slew-rate = <0>;
+			bias-pull-up = <00>;
+		};
+	};
+
+	alsps_intpin_default: alspsdefaultcfg {
+
+	};
+	
+};
+&alsps {
+	pinctrl-names = "pin_default", "pin_cfg";
+	pinctrl-0 = <&alsps_intpin_default>;
+	pinctrl-1 = <&alsps_intpin_cfg>;
+	status = "okay";
+
+};
+
+/* sensor end */
 &accdet {
 		accdet-mic-vol = <7>;
 		headset-mode-setting = <0x500 0x200 1 0x1F0 0x800 0x800 0x20>;
