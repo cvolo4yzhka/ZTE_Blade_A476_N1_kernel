@@ -247,7 +247,7 @@ memory@00000000 {
 	};
 	camera_pins_cam0_pnd1: cam0@3 {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO01__FUNC_GPIO20>;/*GPIO_CAMERA_CMPDN_PIN*/
+			pins = <PINMUX_GPIO20__FUNC_GPIO20>;/*GPIO_CAMERA_CMPDN_PIN*/
 			slew-rate = <1>;
 			output-high;
 		};
