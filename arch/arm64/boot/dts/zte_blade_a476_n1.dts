@@ -52,7 +52,7 @@ memory@00000000 {
 	};
 	led5:led@5 {
 		compatible = "mediatek,button-backlight";
-		led_mode = <2>; //fix set to 2 - gpio mode
+		led_mode = <2>; //set to 2 - gpio mode
 		data = <60>; //gpio number
 		gpio = <&pio 60 0>; //gpio number
 		pwm_config = <0 0 0 0 0>;
@@ -226,28 +226,28 @@ memory@00000000 {
 &pio {
 	camera_pins_cam0_rst0: cam0@0 {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO20__FUNC_GPIO20>;/*GPIO_CAMERA_CMRST_PIN*/
+			pins = <PINMUX_GPIO19__FUNC_GPIO19>;/*GPIO_CAMERA_CMRST_PIN*/
 			slew-rate = <1>; /*direction 0:in, 1:out*/
 			output-low;/*direction out used only. output_low or high*/
 		};
 	};
 	camera_pins_cam0_rst1: cam0@1 {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO20__FUNC_GPIO20>;/*GPIO_CAMERA_CMRST_PIN*/
+			pins = <PINMUX_GPIO19__FUNC_GPIO19>;/*GPIO_CAMERA_CMRST_PIN*/
 			slew-rate = <1>;
 			output-high;
 		};
 	};
 	camera_pins_cam0_pnd0: cam0@2 {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO21__FUNC_GPIO21>;/*GPIO_CAMERA_CMPDN_PIN*/
+			pins = <PINMUX_GPIO20__FUNC_GPIO20>;/*GPIO_CAMERA_CMPDN_PIN*/
 			slew-rate = <1>;
 			output-low;
 		};
 	};
 	camera_pins_cam0_pnd1: cam0@3 {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO21__FUNC_GPIO21>;/*GPIO_CAMERA_CMPDN_PIN*/
+			pins = <PINMUX_GPIO01__FUNC_GPIO20>;/*GPIO_CAMERA_CMPDN_PIN*/
 			slew-rate = <1>;
 			output-high;
 		};

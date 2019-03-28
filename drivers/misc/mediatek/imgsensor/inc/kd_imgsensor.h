@@ -112,6 +112,12 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 *
 ********************************************************************************/
 /* SENSOR CHIP VERSION */
+/*T4KA3*/
+#define T4KA3MIPI_SENSOR_ID                     0x1490
+#define T4KA3OFMIPI_SENSOR_ID                   0x1491
+#define T4KA3SUBMIPI_SENSOR_ID                  0x1492
+#define T4KA3COSMIPI_SENSOR_ID                   0x1493
+/*T4KA3*/
 /*IMX*/
 #define IMX362_SENSOR_ID                        0x0362
 #define IMX338_SENSOR_ID                        0x0338
@@ -287,6 +293,12 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 /* CAMERA DRIVER NAME */
 #define CAMERA_HW_DEVNAME                       "kd_camera_hw"
 /* SENSOR DEVICE DRIVER NAME */
+/*T4KA3*/
+#define SENSOR_DRVNAME_T4KA3_MIPI_RAW           "t4ka3mipiraw"
+#define SENSOR_DRVNAME_T4KA3OF_MIPI_RAW         "t4ka3ofmipiraw"
+#define SENSOR_DRVNAME_T4KA3COS_MIPI_RAW        "t4ka3cosmipiraw"
+#define SENSOR_DRVNAME_T4KA3_MIPI_RAW_SUB       "t4ka3mipirawsub"
+/*T4KA3*/
 /*IMX*/
 #define SENSOR_DRVNAME_IMX362_MIPI_RAW          "imx362mipiraw"
 #define SENSOR_DRVNAME_IMX338_MIPI_RAW          "imx338mipiraw"
