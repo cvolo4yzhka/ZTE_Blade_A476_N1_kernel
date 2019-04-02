@@ -29,7 +29,7 @@
 #include <linux/types.h>
 
 
-
+#include "kd_camera_typedef.h"
 #include "kd_camera_hw.h"
 #include "kd_imgsensor.h"
 #include "kd_imgsensor_define.h"

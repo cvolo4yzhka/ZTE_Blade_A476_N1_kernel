@@ -83,7 +83,7 @@ memory@00000000 {
 		};
 		
 		cust_alsps@0 {
-		compatible = "mediatek,TMD2771";
+		compatible = "mediatek,tmd2771";
 		i2c_num	= <2>;
 		i2c_addr = <0x39 0 0 0>;
 		polling_mode_ps = <0>;
@@ -282,14 +282,14 @@ memory@00000000 {
 	};
 	camera_pins_cam_ldo0_0: cam@0 {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO68__FUNC_GPIO68>;/*GPIO_SPI_MOSI_PIN*/
+			pins = <PINMUX_GPIO81__FUNC_GPIO81>;/*GPIO_SPI_MOSI_PIN*/
 			slew-rate = <1>;
 			output-low;
 		};
 	};
 	camera_pins_cam_ldo0_1: cam@1 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO68__FUNC_GPIO68>;/*GPIO_SPI_MOSI_PIN*/
+			pins = <PINMUX_GPIO81__FUNC_GPIO81>;/*GPIO_SPI_MOSI_PIN*/
 			slew-rate = <1>;
 			output-high;
 		};
