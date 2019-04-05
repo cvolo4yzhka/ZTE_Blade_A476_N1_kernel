@@ -1940,7 +1940,7 @@ initrd=0x44000000,0x1000000 loglevel=8 androidboot.hardware=mt6735";
 		pins_cmd0_dat {
 			pins = <PINMUX_GPIO8__FUNC_MD_EINT1>;
 		};
-/* pin 9 not use in zte blade a476 (is ALS) try to fix MD exception
+/* pin 9 not use in zte blade a476 (is ALS) 
 		pins_cmd1_dat {
 			pins = <PINMUX_GPIO9__FUNC_MD_EINT2>;
 		};*/
@@ -1951,7 +1951,7 @@ initrd=0x44000000,0x1000000 loglevel=8 androidboot.hardware=mt6735";
 		pins_cmd0_dat {
 			pins = <PINMUX_GPIO8__FUNC_C2K_UIM0_HOT_PLUG_IN>;
 		};
-/*pin 9 not use in zte blade a476(is ALS) try to fix MD exception
+/*pin 9 not use in zte blade a476 (is ALS)
 		pins_cmd1_dat {
 			pins = <PINMUX_GPIO9__FUNC_MD_EINT2>;
 		};*/
