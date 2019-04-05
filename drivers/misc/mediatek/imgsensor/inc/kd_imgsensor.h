@@ -116,7 +116,7 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 #define T4KA3MIPI_SENSOR_ID                     0x1490
 #define T4KA3OFMIPI_SENSOR_ID                   0x1491
 #define T4KA3SUBMIPI_SENSOR_ID                  0x1492
-#define T4KA3COSMIPI_SENSOR_ID                   0x1493
+#define T4KA3COSMIPI_SENSOR_ID                  0x1493
 /*T4KA3*/
 /*IMX*/
 #define IMX362_SENSOR_ID                        0x0362
