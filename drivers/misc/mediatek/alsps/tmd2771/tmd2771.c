@@ -58,7 +58,11 @@
 #include <linux/input.h>
 #include <linux/workqueue.h>
 #include <linux/kobject.h>
+
+#if defined(CONFIG_HAS_EARLYSUSPEND)
 #include <linux/earlysuspend.h>
+#endif
+
 #include <linux/platform_device.h>
 #include <asm/atomic.h>
 #include <linux/version.h>
@@ -67,83 +71,26 @@
 #include <asm/io.h>
 #include <linux/module.h>
 
-#include <linux/hwmsen_helper.h>
-#include <cust_eint.h>
-#include <linux/hwmsensor.h>
-#include <linux/sensors_io.h>
-#include <linux/hwmsen_dev.h>
 #include <alsps.h>
-//#ifdef MT6516
-//#include <mach/mt6516_devs.h>
-//#include <mach/mt6516_typedefs.h>
-//#include <mach/mt6516_gpio.h>
-//#include <mach/mt6516_pll.h>
-//#endif
 
-//#ifdef MT6573
-//#include <mach/mt6573_devs.h>
-//#include <mach/mt6573_typedefs.h>
-//#include <mach/mt6573_gpio.h>
-//#include <mach/mt6573_pll.h>
-//#endif
+/*test*/
+#include <mt-plat/mt_gpio.h>
+#include <mach/gpio_const.h>
+/**/
+#include <mach/upmu_sw.h>
+#include <mt-plat/upmu_common.h>
+/*test*/
 
-//#ifdef MT6575
-//#include <mach/mt6575_devs.h>
-//#include <mach/mt6575_typedefs.h>
-//#include <mach/mt6575_gpio.h>
-//#include <mach/mt6575_pm_ldo.h>
-//#endif
-
-
-//#ifdef MT6577
-//#include <mach/mt_devs.h>
-//#include <mach/mt_typedefs.h>
-//#include <mach/mt_gpio.h>
-//#include <mach/mt_pm_ldo.h>
-//#endif
-//#include <mach/mt_devs.h>
-#include <mach/mt_typedefs.h>
-#include <mach/mt_gpio.h>
-#include <mach/mt_pm_ldo.h>
-#include <mach/eint.h>
-
-#include <linux/proc_fs.h>
-
-
-#include <linux/kernel.h>
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/syscalls.h>
-#include <linux/file.h>
-#include <linux/fs.h>
-#include <linux/fcntl.h>
-#include <asm/uaccess.h>
-
-
-//#ifdef MT6516
-//#define POWER_NONE_MACRO MT6516_POWER_NONE
-//#endif
-
-//#ifdef MT6573
-//#define POWER_NONE_MACRO MT65XX_POWER_NONE
-//#endif
-
-//#ifdef MT6575
-//#define POWER_NONE_MACRO MT65XX_POWER_NONE
-//#endif
-
-//#ifdef MT6577
-//#define POWER_NONE_MACRO MT65XX_POWER_NONE
-//#endif
 #define POWER_NONE_MACRO MT65XX_POWER_NONE
 
-
 #include <linux/wakelock.h>
-#include <linux/hwmsensor.h>
-#include <linux/hwmsen_dev.h>
-#include <linux/sensors_io.h>
+#include <hwmsensor.h>
+#include <hwmsen_dev.h>
+#include <sensors_io.h>
 #include <asm/io.h>
-#include <cust_eint.h>
+#include <hwmsensor.h>
+#include <hwmsen_dev.h>
+#include <sensors_io.h>
 #include "tmd2771_cust_alsps.h"
 #include "tmd2771.h"
 /******************************************************************************
@@ -158,9 +105,13 @@
 #define APS_ERR(fmt, args...)    printk(KERN_ERR  APS_TAG"%s %d : "fmt, __FUNCTION__, __LINE__, ##args)
 #define APS_LOG(fmt, args...)    printk(KERN_INFO APS_TAG fmt, ##args)
 #define APS_DBG(fmt, args...)    printk(KERN_INFO APS_TAG fmt, ##args)                 
+
+#define GPIO_ALS_EINT_PIN         (GPIO9|0x80000000)
+#define GPIO_ALS_EINT_PIN_M_EINT  GPIO_MODE_00
 /******************************************************************************
  * extern functions
 *******************************************************************************/
+/*
 extern void mt_eint_mask(unsigned int eint_num);
 extern void mt_eint_unmask(unsigned int eint_num);
 extern void mt_eint_set_hw_debounce(unsigned int eint_num, unsigned int ms);
@@ -168,20 +119,16 @@ extern void mt_eint_set_polarity(unsigned int eint_num, unsigned int pol);
 extern unsigned int mt_eint_set_sens(unsigned int eint_num, unsigned int sens);
 extern void mt_eint_registration(unsigned int eint_num, unsigned int flow, void (EINT_FUNC_PTR)(void), unsigned int is_auto_umask);
 extern void mt_eint_print_status(void);
-
+*/
 /*----------------------------------------------------------------------------*/
 static struct i2c_client *tmd2771_i2c_client = NULL;
 /*----------------------------------------------------------------------------*/
 static const struct i2c_device_id tmd2771_i2c_id[] = {{TMD2771_DEV_NAME,0},{}};
-static struct i2c_board_info __initdata i2c_TMD2771={ I2C_BOARD_INFO("TMD2771", (0X72>>1))};
-/*the adapter id & i2c address will be available in customization*/
-//static unsigned short tmd2771_force[] = {0x02, 0X72, I2C_CLIENT_END, I2C_CLIENT_END};
-//static const unsigned short *const tmd2771_forces[] = { tmd2771_force, NULL };
-//static struct i2c_client_address_data tmd2771_addr_data = { .forces = tmd2771_forces,};
+//static struct i2c_board_info __initdata i2c_TMD2771={ I2C_BOARD_INFO("TMD2771", (0X72>>1))};
 /*----------------------------------------------------------------------------*/
 static int tmd2771_i2c_probe(struct i2c_client *client, const struct i2c_device_id *id); 
 static int tmd2771_i2c_remove(struct i2c_client *client);
-static int tmd2771_i2c_detect(struct i2c_client *client, int kind, struct i2c_board_info *info);
+//static int tmd2771_i2c_detect(struct i2c_client *client, int kind, struct i2c_board_info *info);
 /*----------------------------------------------------------------------------*/
 static int tmd2771_i2c_suspend(struct i2c_client *client, pm_message_t msg);
 static int tmd2771_i2c_resume(struct i2c_client *client);
@@ -203,32 +150,22 @@ static struct tmd2772_alsps_hw cust_alsps_hw = {
     .power_id   = MT65XX_POWER_NONE,    /*LDO is not used*/
     .power_vol  = VOL_DEFAULT,          /*LDO is not used*/
     .i2c_addr   = {0x72, 0x48, 0x78, 0x00},
-    /*Lenovo-sw chenlj2 add 2011-06-03,modify parameter below two lines*/
     .als_level  = { 4, 6, 10,  20,   30,   50,  80,  120,   200, 360, 400,   700,   1200 , 2000,3000},
-    //    .als_level  = { 4, 10,  20,   30,   50,  80,  120,   200, 400,   700,   1200 , 2000},,  3000, 5000, 8000},
-    //.als_value  = {10, 20,20,  120, 120, 280,  280,  280, 1600,  1600,  1600,  6000,  6000, 9000,  10240, 10240},
     .als_value  = {0,  20,  20,  120,  120,  280,  280,  1600, 1600,  6000,  6000,  9000, 9000, 10240,  10240, 10240},
-
-    //.als_level  = { 0,  2,  4,   6,   8,  10,  20, 40, 80,  200,  400, 1000, 2000, 5000, 10000},
-    //.als_value  = {0, 0, 50,  90, 130, 160,  225,  320,  640,  780,  980,  1600,  2600, 4600,  10240, 10240},
     .ps_threshold_high = 900,
     .ps_threshold_low = 750,
     .ps_threshold = 900,
 };
-//struct alsps_hw *get_cust_alsps_hw(void) {
 struct tmd2772_alsps_hw *tmd2771_get_cust_alsps_hw(void) {
     return &cust_alsps_hw;
 }
-//fenggy mask int TMD2771_CMM_PPCOUNT_VALUE = 0x04;
 int TMD2771_CMM_PPCOUNT_VALUE = 0x0c;
 int ZOOM_TIME = 4;
-//int TMD2771_CMM_CONTROL_VALUE = 0xE0;
 int TMD2771_CMM_CONTROL_VALUE = 0x20;
-
 int TMD2771_OFFSET = 0x00;
 
-static u8  offset_data=0;
-static u16 tmp_data=0;
+//static u8  offset_data=0;
+//static u16 tmp_data=0;
 #define CLOSE_AWAY_OFFSET 30
 
 static struct tmd2771_priv *g_tmd2771_ptr = NULL;
@@ -299,29 +236,33 @@ struct tmd2771_priv {
 #endif     
 };
 /*----------------------------------------------------------------------------*/
+#ifdef CONFIG_OF
+static const struct of_device_id alsps_of_match[] = {
+	{.compatible = "mediatek,alsps"},
+	{},
+};
+#endif
+
 static struct i2c_driver tmd2771_i2c_driver = {	
 	.probe      = tmd2771_i2c_probe,
 	.remove     = tmd2771_i2c_remove,
-	.detect     = tmd2771_i2c_detect,
-
+//	.detect     = tmd2771_i2c_detect,
 #if !defined(CONFIG_HAS_EARLYSUSPEND)  
-	
 	.suspend    = tmd2771_i2c_suspend,
 	.resume     = tmd2771_i2c_resume,
 #endif
-
 	.id_table   = tmd2771_i2c_id,
-//	.address_data = &tmd2771_addr_data,
 	.driver = {
-//		.owner          = THIS_MODULE,
 		.name           = TMD2771_DEV_NAME,
+#ifdef CONFIG_OF
+		.of_match_table = alsps_of_match,
+#endif		
 	},
 };
 
 static struct tmd2771_priv *tmd2771_obj = NULL;
-//static struct platform_driver tmd2771_alsps_driver;
 /* Delete for auto detect feature */
-//static struct platform_driver tmd2771_alsps_driver;
+static struct platform_driver tmd2771_alsps_driver;
 /* Delete end */
 
 /* Add for auto detect feature */
@@ -387,17 +328,17 @@ static void tmd2771_power(struct tmd2772_alsps_hw *hw, unsigned int on)
 
 int tmd2771_read_mean(struct i2c_client *client, int n)
 {
-printk(" [alsps]  tmd2771_read_mean start \n ");
-	struct tmd2771_priv *obj = i2c_get_clientdata(client);
+//	struct tmd2771_priv *obj = i2c_get_clientdata(client);
 	int prox_sum = 0, prox_mean = 0;
 	int i, ret = 0;
 	u16 prox_data[20];
+	printk(" [alsps]  tmd2771_read_mean start \n ");	
 	mdelay(10);
 /////////////
 		n=2;
 	for(i = 0; i < n; i++)
 	{
-		if(ret = tmd2771_read_ps(tmd2771_i2c_client, &prox_data[i]))
+		if((ret = tmd2771_read_ps(tmd2771_i2c_client, &prox_data[i])))
 		{
 			printk("tmd2772_read_data_for_cali fail: %d\n", i);
 			return ret;
@@ -413,13 +354,13 @@ printk(" [alsps]  tmd2771_read_mean end \n ");
 }
 
 
-int  tmd2771_3cm_ps_calibrate(){
-APS_FUN();
+int  tmd2771_3cm_ps_calibrate(void){
+//APS_FUN();
 	struct tmd2771_priv *obj = i2c_get_clientdata(tmd2771_i2c_client);
-	struct i2c_client * client = tmd2771_i2c_client;
-
+//	struct i2c_client * client = tmd2771_i2c_client;
+	int value;
 	tmd2771_init_client_for_cali(obj->client);
-	int value=tmd2771_read_mean(tmd2771_i2c_client ,3);
+	value=tmd2771_read_mean(tmd2771_i2c_client ,3);
 	printk("tmd2771_3cm_ps_calibrate_value:%d\n",value);
 	if(value<=400 || value>=900)
 		goto err_out10;
@@ -451,21 +392,21 @@ err_out10:
 
 
 
-static int tmd2771_ps_calibrate()
+/*static int tmd2771_ps_calibrate(void)
 {
 	
 	struct tmd2771_priv *obj = i2c_get_clientdata(tmd2771_i2c_client);
 	struct i2c_client * client = tmd2771_i2c_client;
-	int prox_sum = 0, prox_mean = 0, prox_max = 0;
-	int prox_threshold_hi = 0, prox_threshold_lo = 0;
-	int i, ret = 0;
-	u16 prox_data[20];
+	int prox_mean = 0;
+//	int prox_threshold_hi = 0, prox_threshold_lo = 0;
+//	int i, ret = 0;
+//	u16 prox_data[20];
 	u8 buffer[2];
 	int err,reg_value[10];
 	int res, res_cali;
 APS_FUN();	
 			reg_value[0]=0;
-			res = i2c_master_recv(client, reg_value, 0x1);
+//			res = i2c_master_recv(client, reg_value, 0x1);//fix it lexx - passing argument 2 of 'i2c_master_recv' from incompatible pointer type
 		//	if(res <= 0)
 //				{
 				//	goto EXIT_ERR;
@@ -557,7 +498,7 @@ APS_FUN();
 	
 	
 	reg_value[0]=0;
-	res = i2c_master_recv(client, reg_value, 0x1);
+//	res = i2c_master_recv(client, reg_value, 0x1);//fix it lexx - passing argument 2 of 'i2c_master_recv' from incompatible pointer type
 //	if(res <= 0)
 //				{
 //					goto EXIT_ERR;
@@ -567,7 +508,7 @@ APS_FUN();
 	return res_cali;
 	
 	
-}
+}*/
 
 #define PROX_DATA_SAFE_RANGE_MAX_VALUE  22000
 #define PROX_DATA_SAFE_RANGE_MIN_VALUE   1000
@@ -576,8 +517,8 @@ APS_FUN();
 
 static int read_file(char *filename)
 {
-    int fd;
-    char buf[1];
+//    int fd;
+//    char buf[1];
     struct file *filp;
     char bufs[100];
     int ret;
@@ -605,7 +546,7 @@ static int read_file(char *filename)
     /* read example */
     printk(KERN_DEBUG);
 
-        int pos = (int)filp->f_pos;
+ //       int pos = (int)filp->f_pos;
         printk("filp->f_pos=%d \n: ", (int)filp->f_pos);
         memset(bufs,'\n',60);
         ret = vfs_read(filp, bufs, 60, &filp->f_pos);
@@ -632,7 +573,7 @@ int cali_3cm_status_flag = 0;
 
 static ssize_t tmd2771_show_prox_data_safe_range_max(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_data_safe_range_max\n");
 	if(!tmd2771_obj)
 	{
@@ -647,7 +588,7 @@ static ssize_t tmd2771_show_prox_data_safe_range_max(struct device_driver *ddri,
 
 static ssize_t tmd2771_show_prox_data_safe_range_min(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_data_safe_range_min\n");
 	if(!tmd2771_obj)
 	{
@@ -661,12 +602,12 @@ static ssize_t tmd2771_show_prox_data_safe_range_min(struct device_driver *ddri,
 
 
 
-static long tmd2771_enable_ps_for_cali(struct i2c_client *client, int enable)
+/*static long tmd2771_enable_ps_for_cali(struct i2c_client *client, int enable)
 {
-APS_FUN();
-	struct tmd2771_data *obj = i2c_get_clientdata(client);
+//APS_FUN();
+//	struct tmd2771_data *obj = i2c_get_clientdata(client);
 	u8 databuf[2];
-	u8 buffer[2];  	
+//	u8 buffer[2];  	
 	long res = 0;
 
              APS_LOG("tmd2771_enable_ps  = %x\n",enable);
@@ -700,7 +641,7 @@ APS_FUN();
 EXIT_ERR:
 	APS_ERR("tmd2771_enable_ps fail\n");
 	return res;
-	}
+	}*/
 
  
 static ssize_t tmd2771_show_data_val(struct device_driver *ddri, char *buf)
@@ -725,7 +666,7 @@ int cal_finish_flag = 0;
 
 static ssize_t tmd2771_show_prox_offset_cal(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_offset_cal---val_cali = %d\n", val_cali);
 	if(!tmd2771_obj)
 	{
@@ -739,12 +680,12 @@ static ssize_t tmd2771_show_prox_offset_cal(struct device_driver *ddri, char *bu
 
 
 static ssize_t tmd2771_store_prox_offset_cal(struct device_driver *ddri, const char *buf, size_t count)
-{
+{return 0;
 }
 
 static ssize_t tmd2771_show_prox_thres_max(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_thres_max\n");
 	if(!tmd2771_obj)
 	{
@@ -758,7 +699,7 @@ static ssize_t tmd2771_show_prox_thres_max(struct device_driver *ddri, char *buf
 
 static ssize_t tmd2771_show_prox_thres_min(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_thres_min\n");
 	if(!tmd2771_obj)
 	{
@@ -806,7 +747,7 @@ static ssize_t tmd2771_store_prox_thres_min(struct device_driver *ddri, const ch
 
 static ssize_t tmd2771_show_prox_data_max(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_data_max\n");
 	if(!tmd2771_obj)
 	{
@@ -821,7 +762,7 @@ static ssize_t tmd2771_show_prox_data_max(struct device_driver *ddri, char *buf)
 
 static ssize_t tmd2771_show_prox_thres(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_thres\n");
 	if(!tmd2771_obj)
 	{
@@ -836,7 +777,7 @@ static ssize_t tmd2771_show_prox_thres(struct device_driver *ddri, char *buf)
 
 static ssize_t tmd2771_show_prox_calibrate_start(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_thres\n");
 	if(!tmd2771_obj)
 	{
@@ -868,7 +809,7 @@ static ssize_t tmd2771_store_prox_calibrate_start(struct device_driver *ddri, co
 
 static ssize_t tmd2771_show_prox_3cm_calibrate_status(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_3cm_calibrate_status\n");
 	if(!tmd2771_obj)
 	{
@@ -879,9 +820,9 @@ static ssize_t tmd2771_show_prox_3cm_calibrate_status(struct device_driver *ddri
 	return scnprintf(buf, PAGE_SIZE, "0x%x\n", cali_3cm_status_flag);     	
 }
 
-static ssize_t tmd2771_show_prox_3cm_calibrate_offset(struct device_driver *ddri, char *buf)
+/*static ssize_t tmd2771_show_prox_3cm_calibrate_offset(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_3cm_calibrate_offset\n");
 	if(!tmd2771_obj)
 	{
@@ -890,14 +831,15 @@ static ssize_t tmd2771_show_prox_3cm_calibrate_offset(struct device_driver *ddri
 	}
 	
 	return scnprintf(buf, PAGE_SIZE, "0x%x\n", offset_data);     	
-}
+}*/
 int offset_flag = 0;
+/*
 static ssize_t tmd2771_store_prox_3cm_calibrate_offset(struct device_driver *ddri, char *buf)
 {
 	int res, offset_data;
 	struct i2c_client * client = tmd2771_i2c_client;
 	u8 buffer[2];  
-	int flag = 0;
+//	int flag = 0;
 	if(!tmd2771_obj)
 	{
 		APS_ERR("tmd2771_obj is null!!\n");
@@ -915,11 +857,11 @@ static ssize_t tmd2771_store_prox_3cm_calibrate_offset(struct device_driver *ddr
 	res= i2c_master_send(client, buffer, 0x2);
 	offset_flag =1;
 	}
-}
+}*/
 
-static ssize_t tmd2771_show_prox_3cm_calibrate_close(struct device_driver *ddri, char *buf)
+/*static ssize_t tmd2771_show_prox_3cm_calibrate_close(struct device_driver *ddri, char *buf)
 {
-	int res;
+//	int res;
 	printk("tmd2771_show_prox_3cm_calibrate_close\n");
 	if(!tmd2771_obj)
 	{
@@ -928,9 +870,9 @@ static ssize_t tmd2771_show_prox_3cm_calibrate_close(struct device_driver *ddri,
 	}
 	printk("tmd2771_show_prox_3cm_calibrate_close  %x??%d  \n", ps_cali.close, ps_cali.close);
 	return scnprintf(buf, PAGE_SIZE, "0x%x\n", ps_cali.close);     	
-}
+}*/
 
-static ssize_t tmd2771_store_prox_3cm_calibrate_close(struct device_driver *ddri, char *buf)
+/*static ssize_t tmd2771_store_prox_3cm_calibrate_close(struct device_driver *ddri, char *buf)
 {
 	int close;
 	
@@ -953,7 +895,7 @@ printk(" [alsps] close =%d ,for_away=%d \n",ps_cali.close,ps_cali.far_away);
 	atomic_set(&tmd2771_obj->ps_thd_val_low,  tmd2771_obj->hw->ps_threshold_low);
 			
 
-}
+}*/
 
 static ssize_t tmd2771_store_prox_3cm_calibrate_start(struct device_driver *ddri, const char *buf, size_t count)
 {
@@ -977,17 +919,16 @@ static ssize_t tmd2771_store_prox_3cm_calibrate_start(struct device_driver *ddri
 
 
 void tmd2771_store_prox_test(struct device_driver *ddri, const char *buf, size_t count){
-APS_FUN();	
-	int value;
-	printk("tmd2771_store_prox_thres\n");
+//APS_FUN();	
+//	int value;
 	int crosstalk=0;
 	int threshold = 0;
 	int cali_finish_flag = 0;
-	
+	printk("tmd2771_store_prox_thres\n");	
 	if(!tmd2771_obj)
 	{
 		APS_ERR("tmd2771_obj is null!!\n");
-		return 0;
+//		return 0;
 	}
 
 	   cali_start_flag = 1;
@@ -1011,7 +952,7 @@ APS_FUN();
 static ssize_t tmd2771_store_prox_thres(struct device_driver *ddri, const char *buf, size_t count)
 {
 	int value;
-	printk("tmd2771_store_prox_thres\n");
+//	printk("tmd2771_store_prox_thres\n");
 	int crosstalk=0;
 	int threshold = 0;
 	int cali_finish_flag = 0;
@@ -1050,15 +991,15 @@ static ssize_t tmd2771_store_prox_thres(struct device_driver *ddri, const char *
 	return count;    
 }
 
-static ssize_t tmd2771_show_prox_offset_start(struct device_driver *ddri, char *buf)
+/*static ssize_t tmd2771_show_prox_offset_start(struct device_driver *ddri, char *buf)
 {
-	
-}
-static ssize_t tmd2771_store_prox_offset_start(struct device_driver *ddri, const char *buf, size_t count)
+return 0;	
+}*/
+/*static ssize_t tmd2771_store_prox_offset_start(struct device_driver *ddri, const char *buf, size_t count)
 {
 	int value;
 	
-	struct tmd2771_priv *obj = i2c_get_clientdata(tmd2771_i2c_client);
+//	struct tmd2771_priv *obj = i2c_get_clientdata(tmd2771_i2c_client);
 	struct i2c_client * client = tmd2771_i2c_client;
 	
 	printk("tmd2771_store_prox_calibrate_start\n");
@@ -1076,7 +1017,7 @@ static ssize_t tmd2771_store_prox_offset_start(struct device_driver *ddri, const
 	}
 
 	return count;    
-}
+}*/
 
 
 static DRIVER_ATTR(prox_data_safe_range_max ,     0664, tmd2771_show_prox_data_safe_range_max , NULL);
@@ -1088,12 +1029,12 @@ static DRIVER_ATTR(prox_thres_min ,   0664, tmd2771_show_prox_thres_min,		tmd277
 static DRIVER_ATTR(prox_data_max ,  0664, tmd2771_show_prox_data_max, NULL);
 static DRIVER_ATTR(prox_thres ,    0664, tmd2771_show_prox_thres, tmd2771_store_prox_thres);
 static DRIVER_ATTR(prox_calibrate_start  ,    0664, tmd2771_show_prox_calibrate_start, tmd2771_store_prox_calibrate_start);
-static DRIVER_ATTR(prox_offset_start ,     0664, tmd2771_show_prox_offset_start, tmd2771_store_prox_offset_start);
-static DRIVER_ATTR(prox_test ,     0664, NULL, tmd2771_store_prox_test);
+//static DRIVER_ATTR(prox_offset_start ,     0664, tmd2771_show_prox_offset_start, tmd2771_store_prox_offset_start);
+//static DRIVER_ATTR(prox_test ,     0664, NULL, tmd2771_store_prox_test);
 static DRIVER_ATTR(prox_3cm_calibrate_start  ,    0664, NULL, tmd2771_store_prox_3cm_calibrate_start);
 static DRIVER_ATTR(prox_3cm_calibrate_status  ,    0664, tmd2771_show_prox_3cm_calibrate_status, NULL);
-static DRIVER_ATTR(prox_3cm_calibrate_offset  ,    0664, tmd2771_show_prox_3cm_calibrate_offset, tmd2771_store_prox_3cm_calibrate_offset);
-static DRIVER_ATTR(prox_3cm_calibrate_close  ,    0664, tmd2771_show_prox_3cm_calibrate_close, tmd2771_store_prox_3cm_calibrate_close);
+//static DRIVER_ATTR(prox_3cm_calibrate_offset  ,    0664, tmd2771_show_prox_3cm_calibrate_offset, tmd2771_store_prox_3cm_calibrate_offset);
+//static DRIVER_ATTR(prox_3cm_calibrate_close  ,    0664, tmd2771_show_prox_3cm_calibrate_close, tmd2771_store_prox_3cm_calibrate_close);
 /*----------------------------------------------------------------------------*/
 static struct driver_attribute *tmd2771_attr_list[] = {
     &driver_attr_prox_data_safe_range_max,
@@ -1107,9 +1048,9 @@ static struct driver_attribute *tmd2771_attr_list[] = {
     &driver_attr_prox_calibrate_start,
     &driver_attr_prox_3cm_calibrate_start,
     &driver_attr_prox_3cm_calibrate_status,
-    &driver_attr_prox_3cm_calibrate_offset,
-    &driver_attr_prox_3cm_calibrate_close,
-	&driver_attr_prox_offset_start,
+//    &driver_attr_prox_3cm_calibrate_offset,
+//    &driver_attr_prox_3cm_calibrate_close,
+//	&driver_attr_prox_offset_start,
 };
 
 /*----------------------------------------------------------------------------*/
@@ -1135,10 +1076,10 @@ printk("[alsps ] tmd2771_create_attr \n");
 /*----------------------------------------------------------------------------*/
 	static int tmd2771_delete_attr(struct device_driver *driver)
 	{
-printk("[alsps ] tmd2771_create_attr \n");	
+
 	int idx ,err = 0;
 	int num = (int)(sizeof(tmd2771_attr_list)/sizeof(tmd2771_attr_list[0]));
-
+printk("[alsps ] tmd2771_create_attr \n");	
 	if (!driver)
 	return -EINVAL;
 
@@ -1312,8 +1253,8 @@ static long tmd2771_enable_ps(struct i2c_client *client, int enable)
 	struct tmd2771_priv *obj = i2c_get_clientdata(client);
 	u8 databuf[2];    
 	long res = 0;
-	u8 buffer[1];
-	u8 reg_value[1];
+//	u8 buffer[1];
+//	u8 reg_value[1];
 	uint32_t testbit_ALS;
 
 	if(client == NULL)
@@ -1626,7 +1567,7 @@ static long tmd2771_enable_ps(struct i2c_client *client, int enable)
 			printk("Yucong:0x%x, %d, %s\n", reg_value[0], __LINE__, __FUNCTION__);
 			#endif
 		
-			mt_eint_unmask(CUST_EINT_ALS_NUM);
+//			mt_eint_unmask(CUST_EINT_ALS_NUM);
 		}
 	}
 	else
@@ -1657,7 +1598,7 @@ static long tmd2771_enable_ps(struct i2c_client *client, int enable)
 		if(0 == obj->hw->polling_mode_ps)
 		{
 			cancel_work_sync(&obj->eint_work);
-			mt_eint_mask(CUST_EINT_ALS_NUM);
+//			mt_eint_mask(CUST_EINT_ALS_NUM);
 		}
 	}
 #endif
@@ -1802,7 +1743,7 @@ EXIT_ERR:
 /*yucong add for interrupt mode support MTK inc 2012.3.7*/
 static int tmd2771_check_intr(struct i2c_client *client) 
 {
-	struct tmd2771_priv *obj = i2c_get_clientdata(client);
+//	struct tmd2771_priv *obj = i2c_get_clientdata(client);
 	int res,intp,intl;
 	u8 buffer[2];
 
@@ -1844,7 +1785,7 @@ EXIT_ERR:
 
 static int tmd2771_clear_intr(struct i2c_client *client) 
 {
-	struct tmd2771_priv *obj = i2c_get_clientdata(client);
+//	struct tmd2771_priv *obj = i2c_get_clientdata(client);
 	int res;
 	u8 buffer[2];
 
@@ -1906,10 +1847,10 @@ int tmd2771_setup_eint(struct i2c_client *client)
     mt_set_gpio_pull_enable(GPIO_ALS_EINT_PIN, GPIO_PULL_ENABLE);
     mt_set_gpio_pull_select(GPIO_ALS_EINT_PIN, GPIO_PULL_UP);
 
-	mt_eint_set_hw_debounce(CUST_EINT_ALS_NUM, CUST_EINT_ALS_DEBOUNCE_CN);
-	mt_eint_registration(CUST_EINT_ALS_NUM, CUST_EINT_ALS_TYPE, tmd2771_eint_func, 0);
+//	mt_eint_set_hw_debounce(CUST_EINT_ALS_NUM, CUST_EINT_ALS_DEBOUNCE_CN);
+//	mt_eint_registration(CUST_EINT_ALS_NUM, CUST_EINT_ALS_TYPE, tmd2771_eint_func, 0);
 
-	mt_eint_unmask(CUST_EINT_ALS_NUM);
+//	mt_eint_unmask(CUST_EINT_ALS_NUM);
     return 0;
 }
 
@@ -1919,7 +1860,7 @@ int tmd2771_setup_eint(struct i2c_client *client)
 static int tmd2771_init_client_for_cali(struct i2c_client *client)
 {
 
-	struct tmd2771_priv *obj = i2c_get_clientdata(client);
+//	struct tmd2771_priv *obj = i2c_get_clientdata(client);
 	u8 databuf[2];    
 	int res = 0;
    
@@ -2176,7 +2117,7 @@ static int tmd2771_init_client(struct i2c_client *client)
 		APS_ERR("setup eint: %d\n", res);
 		return res;
 	}
-	if(res = tmd2771_check_and_clear_intr(client))
+	if((res = tmd2771_check_and_clear_intr(client)))
 	{
 		APS_ERR("check/clear intr: %d\n", res);
 		//    return res;
@@ -2202,7 +2143,7 @@ int tmd2771_read_als(struct i2c_client *client, u16 *data)
 	u16 atio;
 	//u16 als_value;
 	int res = 0;
-	u8 reg_value[1];
+//	u8 reg_value[1];
 	
 	if(client == NULL)
 	{
@@ -2336,7 +2277,7 @@ EXIT_ERR:
 }
 int tmd2771_read_als_ch0(struct i2c_client *client, u16 *data)
 {
-	struct tmd2771_priv *obj = i2c_get_clientdata(client);	 
+//	struct tmd2771_priv *obj = i2c_get_clientdata(client);	 
 	u16 c0_value;	 
 	u8 als_value_low[1], als_value_high[1];
 	u8 buffer[1];
@@ -2431,13 +2372,13 @@ static int tmd2771_get_als_value(struct tmd2771_priv *obj, u16 als)
 long tmd2771_read_ps(struct i2c_client *client, u16 *data)
 {
 	
-printk(" [alsps]  tmd2771_read_ps start \n ");	
-	struct tmd2771_priv *obj = i2c_get_clientdata(client);    
+
+//	struct tmd2771_priv *obj = i2c_get_clientdata(client);    
 	//u16 ps_value;    
 	u8 ps_value_low[1], ps_value_high[1];
 	u8 buffer[1];
 	long res = 0;
-
+printk(" [alsps]  tmd2771_read_ps start \n ");	
 	if(client == NULL)
 	{
 		APS_DBG("CLIENT CANN'T EQUL NULL\n");
@@ -2585,9 +2526,9 @@ static void tmd2771_eint_work(struct work_struct *work)
 {
 	struct tmd2771_priv *obj = (struct tmd2771_priv *)container_of(work, struct tmd2771_priv, eint_work);
 	int err;
-	hwm_sensor_data sensor_data;
-	u8 buffer[1];
-	u8 reg_value[1];
+	struct hwm_sensor_data sensor_data;
+//	u8 buffer[1];
+//	u8 reg_value[1];
 	u8 databuf[2];
 	int res = 0;
 
@@ -2683,7 +2624,7 @@ static void tmd2771_eint_work(struct work_struct *work)
 		}
 	}
 	tmd2771_clear_intr(obj->client);
-	mt_eint_unmask(CUST_EINT_ALS_NUM);      
+//	mt_eint_unmask(CUST_EINT_ALS_NUM);      
 }
 
 
@@ -2712,7 +2653,7 @@ static int tmd2771_release(struct inode *inode, struct file *file)
 
 
 #ifdef OPEN_PROX_ARITHMETIC // fenggy open
-static void tmd2771_WriteCalibration(struct PS_CALI_DATA_STRUCT *data_cali)
+/*static void tmd2771_WriteCalibration(struct PS_CALI_DATA_STRUCT *data_cali)
 {
 
 	   APS_LOG("tmd2771_WriteCalibration  1 %d," ,data_cali->close);
@@ -2742,7 +2683,7 @@ static void tmd2771_WriteCalibration(struct PS_CALI_DATA_STRUCT *data_cali)
 	  }
 	  
 
-}
+}*/
 #endif
 
 #ifdef OPEN_PROX_ARITHMETIC // fenggy open
@@ -2754,7 +2695,7 @@ static int tmd2771_read_data_for_cali(struct i2c_client *client, struct PS_CALI_
 	 for(i = 0;i<=20;i++)
 	 {
 	 		mdelay(5);//50
-			if(err = tmd2771_read_ps(client,&data[i]))
+			if((err = tmd2771_read_ps(client,&data[i])))
 			{
 				APS_ERR("tmd2771_read_data_for_cali fail: %d\n", i); 
 				break;
@@ -2906,7 +2847,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 	void __user *ptr = (void __user*) arg;
 	int dat;
 	uint32_t enable;
-	struct PS_CALI_DATA_STRUCT ps_cali_temp;
+//	struct PS_CALI_DATA_STRUCT ps_cali_temp;
 
 	switch (cmd)
 	{
@@ -2918,7 +2859,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			}
 			if(enable)
 			{
-				if(err = tmd2771_enable_ps(obj->client, 1))
+				if((err = tmd2771_enable_ps(obj->client, 1)))
 				{
 		//			APS_ERR("enable ps fail: %ld\n", err); 
 					goto err_out;
@@ -2928,7 +2869,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			}
 			else
 			{
-				if(err = tmd2771_enable_ps(obj->client, 0))
+				if((err = tmd2771_enable_ps(obj->client, 0)))
 				{
 //					APS_ERR("disable ps fail: %d\n", err); 
 					goto err_out;
@@ -2948,7 +2889,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			break;
 
 		case ALSPS_GET_PS_DATA:    
-			if(err = tmd2771_read_ps(obj->client, &obj->ps))
+			if((err = tmd2771_read_ps(obj->client, &obj->ps)))
 			{
 				goto err_out;
 			}
@@ -2962,7 +2903,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			break;
 
 		case ALSPS_GET_PS_RAW_DATA:    
-			if(err = tmd2771_read_ps(obj->client, &obj->ps))
+			if((err = tmd2771_read_ps(obj->client, &obj->ps)))
 			{
 				goto err_out;
 			}
@@ -2983,7 +2924,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			}
 			if(enable)
 			{
-				if(err = tmd2771_enable_als(obj->client, 1))
+				if((err = tmd2771_enable_als(obj->client, 1)))
 				{
 //					APS_ERR("enable als fail: %d\n", err); 
 					goto err_out;
@@ -2992,7 +2933,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			}
 			else
 			{
-				if(err = tmd2771_enable_als(obj->client, 0))
+				if((err = tmd2771_enable_als(obj->client, 0)))
 				{
 //					APS_ERR("disable als fail: %d\n", err); 
 					goto err_out;
@@ -3011,7 +2952,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			break;
 
 		case ALSPS_GET_ALS_DATA: 
-			if(err = tmd2771_read_als(obj->client, &obj->als))
+			if((err = tmd2771_read_als(obj->client, &obj->als)))
 			{
 				goto err_out;
 			}
@@ -3025,7 +2966,7 @@ static long tmd2771_unlocked_ioctl(struct file *file, unsigned int cmd,
 			break;
 
 		case ALSPS_GET_ALS_RAW_DATA:    
-			if(err = tmd2771_read_als(obj->client, &obj->als))
+			if((err = tmd2771_read_als(obj->client, &obj->als)))
 			{
 				goto err_out;
 			}
@@ -3156,6 +3097,7 @@ static int tmd2771_i2c_resume(struct i2c_client *client)
 	return 0;
 }
 /*----------------------------------------------------------------------------*/
+#if defined(CONFIG_HAS_EARLYSUSPEND)
 static void tmd2771_early_suspend(struct early_suspend *h) 
 {   /*early_suspend is only applied for ALS*/
 	struct tmd2771_priv *obj = container_of(h, struct tmd2771_priv, early_drv);   
@@ -3204,13 +3146,14 @@ static void tmd2771_late_resume(struct early_suspend *h)
 	}
 	#endif
 }
+#endif
 
 int tmd2771_ps_operate(void* self, uint32_t command, void* buff_in, int size_in,
 		void* buff_out, int size_out, int* actualout)
 {
 	int err = 0;
 	int value;
-	hwm_sensor_data* sensor_data;
+	struct hwm_sensor_data* sensor_data;
 	struct tmd2771_priv *obj = (struct tmd2771_priv *)self;
 	
 	//APS_FUN();
@@ -3236,7 +3179,7 @@ int tmd2771_ps_operate(void* self, uint32_t command, void* buff_in, int size_in,
 				value = *(int *)buff_in;
 				if(value)
 				{
-					if(err = tmd2771_enable_ps(obj->client, 1))
+					if((err = tmd2771_enable_ps(obj->client, 1)))
 					{
 						APS_ERR("enable ps fail: %d\n", err); 
 						return -1;
@@ -3253,7 +3196,7 @@ int tmd2771_ps_operate(void* self, uint32_t command, void* buff_in, int size_in,
 				}
 				else
 				{
-					if(err = tmd2771_enable_ps(obj->client, 0))
+					if((err = tmd2771_enable_ps(obj->client, 0)))
 					{
 						APS_ERR("disable ps fail: %d\n", err); 
 						return -1;
@@ -3272,14 +3215,14 @@ int tmd2771_ps_operate(void* self, uint32_t command, void* buff_in, int size_in,
 			break;
 
 		case SENSOR_GET_DATA:
-			if((buff_out == NULL) || (size_out< sizeof(hwm_sensor_data)))
+			if((buff_out == NULL) || (size_out< sizeof(struct hwm_sensor_data)))
 			{
 				APS_ERR("get sensor data parameter error!\n");
 				err = -EINVAL;
 			}
 			else
 			{
-				sensor_data = (hwm_sensor_data *)buff_out;	
+				sensor_data = (struct hwm_sensor_data *)buff_out;	
 				tmd2771_read_ps(obj->client, &obj->ps);
 				
                                 //mdelay(160);
@@ -3304,7 +3247,7 @@ int tmd2771_als_operate(void* self, uint32_t command, void* buff_in, int size_in
 {
 	int err = 0;
 	int value;
-	hwm_sensor_data* sensor_data;
+	struct hwm_sensor_data* sensor_data;
 	struct tmd2771_priv *obj = (struct tmd2771_priv *)self;
 
 	switch (command)
@@ -3329,7 +3272,7 @@ int tmd2771_als_operate(void* self, uint32_t command, void* buff_in, int size_in
 				value = *(int *)buff_in;				
 				if(value)
 				{
-					if(err = tmd2771_enable_als(obj->client, 1))
+					if((err = tmd2771_enable_als(obj->client, 1)))
 					{
 						APS_ERR("enable als fail: %d\n", err); 
 						return -1;
@@ -3338,7 +3281,7 @@ int tmd2771_als_operate(void* self, uint32_t command, void* buff_in, int size_in
 				}
 				else
 				{
-					if(err = tmd2771_enable_als(obj->client, 0))
+					if((err = tmd2771_enable_als(obj->client, 0)))
 					{
 						APS_ERR("disable als fail: %d\n", err); 
 						return -1;
@@ -3350,14 +3293,14 @@ int tmd2771_als_operate(void* self, uint32_t command, void* buff_in, int size_in
 			break;
 
 		case SENSOR_GET_DATA:
-			if((buff_out == NULL) || (size_out< sizeof(hwm_sensor_data)))
+			if((buff_out == NULL) || (size_out< sizeof(struct hwm_sensor_data)))
 			{
 				APS_ERR("get sensor data parameter error!\n");
 				err = -EINVAL;
 			}
 			else
 			{
-				sensor_data = (hwm_sensor_data *)buff_out;
+				sensor_data = (struct hwm_sensor_data *)buff_out;
 				/*yucong MTK add for fixing know issue*/
 				#if 1
 				tmd2771_read_als(obj->client, &obj->als);
@@ -3390,11 +3333,11 @@ int tmd2771_als_operate(void* self, uint32_t command, void* buff_in, int size_in
 
 
 /*----------------------------------------------------------------------------*/
-static int tmd2771_i2c_detect(struct i2c_client *client, int kind, struct i2c_board_info *info) 
-{    
-	strcpy(info->type, TMD2771_DEV_NAME);
-	return 0;
-}
+//static int tmd2771_i2c_detect(struct i2c_client *client, int kind, struct i2c_board_info *info) 
+//{    
+//	strcpy(info->type, TMD2771_DEV_NAME);
+//	return 0;
+//}
 
 void tmd2771_read_data(struct i2c_client *client, struct PS_CALI_DATA_STRUCT *ps_data_cali)
 {
@@ -3404,7 +3347,7 @@ void tmd2771_read_data(struct i2c_client *client, struct PS_CALI_DATA_STRUCT *ps
 	 for(i = 0;i<=20;i++)
 	 {
 	 		mdelay(5);//50
-			if(err = tmd2771_read_ps(client,&data[i]))
+			if((err = tmd2771_read_ps(client,&data[i])))
 			{
 				APS_ERR("tmd2771_read_data fail: %d\n", i); 
 				break;
@@ -3459,7 +3402,7 @@ int tmd2771_close_away_proc_write( struct file *filp, const char __user *buf,uns
 		char str_buf[256]={0};
 		int close,away;
 		
-		copy_from_user(str_buf,buf,len);
+//		copy_from_user(str_buf,buf,len);
 
 		sscanf(str_buf,"%d:%d",&close,&away);
 		
@@ -3484,7 +3427,7 @@ int tmd2771_close_away_proc_read(char *buf, char **start, off_t offset, int requ
 		int	 len=0;
 		int err= 1;
 		struct PS_CALI_DATA_STRUCT tmp_data;
-		if(err = tmd2771_enable_ps(tmd2771_i2c_client, 1))
+		if((err = tmd2771_enable_ps(tmd2771_i2c_client, 1)))
 		{
 	//		APS_ERR("enable ps fail: %ld\n", err); 
 			goto err_out;
@@ -3511,8 +3454,8 @@ static struct file_operations tmd2771_fops = {
 	.owner = THIS_MODULE,
 	.open = tmd2771_open,
 	.release = tmd2771_release,
-    .write = tmd2771_close_away_proc_write,
-    .read = tmd2771_close_away_proc_read,	
+//    .write = tmd2771_close_away_proc_write,
+//    .read = tmd2771_close_away_proc_read,	
 	.unlocked_ioctl = tmd2771_unlocked_ioctl,
 };
 /*----------------------------------------------------------------------------*/
@@ -3581,13 +3524,13 @@ static int tmd2771_i2c_probe(struct i2c_client *client, const struct i2c_device_
 	if(err)
 	{
 		APS_ERR("tmd2771_get_ps_rawdata error ,set the defult vaule\n");
-		if(err = tmd2771_init_client(client))
+		if((err = tmd2771_init_client(client)))
 		{
 			goto exit_init_failed;
 		}
 	}
 #else	
-	if(err = tmd2771_init_client(client))
+	if((err = tmd2771_init_client(client)))
 	{
 		goto exit_init_failed;
 	}
@@ -3597,7 +3540,7 @@ static int tmd2771_i2c_probe(struct i2c_client *client, const struct i2c_device_
 
 	APS_ERR("tmd2771_init_client() OK!\n");
 
-	if(err = misc_register(&tmd2771_device))
+	if((err = misc_register(&tmd2771_device)))
 	{
 		APS_ERR("tmd2771_device register failed\n");
 		goto exit_misc_device_register_failed;
@@ -3631,7 +3574,7 @@ printk("[alsps ] tmd2771  probe 4 \n");
 
 	obj_ps.self = tmd2771_obj;
 	obj_ps.sensor_operate = tmd2771_ps_operate;
-	if(err = hwmsen_attach(ID_PROXIMITY, &obj_ps))
+	if((err = hwmsen_attach(ID_PROXIMITY, &obj_ps)))
 	{
 		APS_ERR("attach fail = %d\n", err);
 		goto exit_create_attr_failed;
@@ -3640,7 +3583,7 @@ printk("[alsps ] tmd2771  probe 4 \n");
 	obj_als.self = tmd2771_obj;
 	obj_als.polling = 1;
 	obj_als.sensor_operate = tmd2771_als_operate;
-	if(err = hwmsen_attach(ID_LIGHT, &obj_als))
+	if((err = hwmsen_attach(ID_LIGHT, &obj_als)))
 	{
 		APS_ERR("attach fail = %d\n", err);
 		goto exit_create_attr_failed;
@@ -3666,10 +3609,10 @@ printk("[alsps ] tmd2771  probe 4 \n");
 	exit_init_failed:
 //	cancel_delayed_work(&obj->eint_work);
 	cancel_work_sync(&obj->eint_work);
-	if(0 == obj->hw->polling_mode_ps)
-	{
-		mt_eint_mask(CUST_EINT_ALS_NUM);
-	}
+	//if(0 == obj->hw->polling_mode_ps)
+	//{
+	//	mt_eint_mask(CUST_EINT_ALS_NUM);
+	//}
 	//i2c_detach_client(client);
 	//exit_kfree:
 	kfree(obj);
@@ -3686,14 +3629,14 @@ static int tmd2771_i2c_remove(struct i2c_client *client)
 {
 	int err;	
 	
-	if(err = tmd2771_delete_attr(&tmd2771_i2c_driver.driver))
+	if((err = tmd2771_delete_attr(&tmd2771_i2c_driver.driver)))
 	{
 		APS_ERR("tmd2771_delete_attr fail: %d\n", err);
 	} 
 
-	remove_proc_entry("tmd2771closeaway",proc_tmd2771_close_away);
+//	remove_proc_entry("tmd2771closeaway",proc_tmd2771_close_away);
 
-	if(err = misc_deregister(&tmd2771_device))
+	if((err = misc_deregister(&tmd2771_device)))
 	{
 		APS_ERR("misc_deregister fail: %d\n", err);    
 	}
@@ -3776,17 +3719,14 @@ static int tmd2771_remove(void)
 static int __init tmd2771_init(void)
 {
 	APS_FUN();
-	i2c_register_board_info(2, &i2c_TMD2771, 1);
-#if 0 /* Modify for auto detect feature */	
+//	i2c_register_board_info(2, &i2c_TMD2771, 1);
+
 	if(platform_driver_register(&tmd2771_alsps_driver))
 	{
 		APS_ERR("failed to register driver");
 		return -ENODEV;
 	}
-#else	
-	APS_ERR("tmd2771_init...\n");
-	alsps_driver_add(&tmd2771_init_info);	
-#endif	
+	
 	return 0;
 }
 /*----------------------------------------------------------------------------*/
