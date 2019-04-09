@@ -10,4 +10,4 @@ export  KBUILD_OUTPUT=out
 #set defconfig
 make zte_blade_a476_n1_defconfig
 #start compile
-make Image.gz-dtb -j16 2>&1 | tee out/build.log
+make Image.gz-dtb -j1 2>&1 | tee out/build.log

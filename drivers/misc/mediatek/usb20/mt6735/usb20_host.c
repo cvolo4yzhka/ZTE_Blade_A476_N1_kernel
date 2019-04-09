@@ -94,6 +94,10 @@ void mt_usb_set_vbus(struct musb *musb, int is_on)
 		fan5405_set_opa_mode(1);
 		fan5405_set_otg_pl(1);
 		fan5405_set_otg_en(1);
+	#elif defined(CONFIG_MTK_BQ24158_SUPPORT)
+		bq24158_set_opa_mode(1);
+		bq24158_set_otg_pl(1);
+		bq24158_set_otg_en(1);
 	#elif defined(CONFIG_MTK_BQ24261_SUPPORT)
 		bq24261_set_en_boost(1);
 	#elif defined(CONFIG_MTK_BQ24296_SUPPORT)
@@ -127,6 +131,9 @@ void mt_usb_set_vbus(struct musb *musb, int is_on)
 	#ifdef CONFIG_MTK_FAN5405_SUPPORT
 		fan5405_reg_config_interface(0x01, 0x30);
 		fan5405_reg_config_interface(0x02, 0x8e);
+	#elif defined(CONFIG_MTK_BQ24158_SUPPORT)
+		bq24158_reg_config_interface(0x01, 0x30);
+		bq24158_reg_config_interface(0x02, 0x8e);
 	#elif defined(CONFIG_MTK_BQ24261_SUPPORT)
 		bq24261_set_en_boost(0);
 	#elif defined(CONFIG_MTK_BQ24296_SUPPORT)
