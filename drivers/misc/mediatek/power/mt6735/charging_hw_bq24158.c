@@ -550,7 +550,7 @@ static void hw_bc11_done(void)
 	}
 	else
 	{
-
+//cvolo4yzhka may be need edit to usbdrive otg
 #if defined(CONFIG_USB_MTK_HDRC_HCD)
 		if(mt_usb_is_device())
 #endif 			

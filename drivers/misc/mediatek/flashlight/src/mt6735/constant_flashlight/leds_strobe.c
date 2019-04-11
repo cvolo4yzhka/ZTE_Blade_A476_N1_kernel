@@ -38,7 +38,10 @@
 #include <linux/i2c.h>
 #include <linux/leds.h>
 
-
+/*fix flash*/
+#include <mt-plat/mt_gpio.h>
+#include <mach/gpio_const.h>
+/*end flash*/
 
 /******************************************************************************
  * Debug configuration
@@ -50,6 +53,10 @@
 /* ANDROID_LOG_INFO */
 /* ANDROID_LOG_DEBUG */
 /* ANDROID_LOG_VERBOSE */
+
+#define IC_ENABLE_PIN       (GPIO10 | 0x80000000)  //GPIO_CAMERA_FLASH_EN_PIN
+#define FLASH_ENABLE_PIN    (GPIO4 | 0x80000000)   //GPIO_CAMERA_FLASH_MODE_PIN
+#define TORCH_ENABLE_PIN    (GPIO21 | 0x80000000)  //GPIO_TORCH_EN
 
 #define TAG_NAME "[leds_strobe.c]"
 #define PK_DBG_NONE(fmt, arg...)    do {} while (0)
@@ -87,7 +94,7 @@ static struct work_struct workTimeOut;
 /* #define FLASH_GPIO_ENF GPIO12 */
 /* #define FLASH_GPIO_ENT GPIO13 */
 
-static int g_bLtVersion;
+//static int g_bLtVersion=0;
 
 /*****************************************************************************
 Functions
@@ -213,7 +220,7 @@ static int LM3642_remove(struct i2c_client *client)
 }
 
 
-#define LM3642_NAME "leds-LM3642"
+#define LM3642_NAME "leds-LM3646"
 static const struct i2c_device_id LM3642_id[] = {
 	{LM3642_NAME, 0},
 	{}
@@ -252,7 +259,7 @@ static void __exit LM3642_exit(void)
 module_init(LM3642_init);
 module_exit(LM3642_exit);
 
-MODULE_DESCRIPTION("Flash driver for LM3642");
+MODULE_DESCRIPTION("Flash driver for LM3646");
 MODULE_AUTHOR("pw <pengwei@mediatek.com>");
 MODULE_LICENSE("GPL v2");
 
@@ -268,78 +275,94 @@ int readReg(int reg)
 int FL_Enable(void)
 {
 	char buf[2];
-/* char bufR[2]; */
-	if (g_duty < 0)
-		g_duty = 0;
-	else if (g_duty > 16)
-		g_duty = 16;
-	if (g_duty <= 2) {
-		int val;
+//	char bufR[2];
 
-		if (g_bLtVersion == 1) {
-			if (g_duty == 0)
-				val = 3;
-			else if (g_duty == 1)
-				val = 5;
-			else	/* if(g_duty==2) */
-				val = 7;
-		} else {
-			if (g_duty == 0)
-				val = 1;
-			else if (g_duty == 1)
-				val = 2;
-			else	/* if(g_duty==2) */
-				val = 3;
-		}
-		buf[0] = 9;
-		buf[1] = val << 4;
-		/* iWriteRegI2C(buf , 2, STROBE_DEVICE_ID); */
-		LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
+	printk("g_duty--:%d\n",g_duty);
+	
+	mt_set_gpio_mode(IC_ENABLE_PIN, GPIO_MODE_00);
+	mt_set_gpio_dir(IC_ENABLE_PIN,GPIO_DIR_OUT);
+	mt_set_gpio_out(IC_ENABLE_PIN,GPIO_OUT_ONE);
 
-		buf[0] = 10;
-		buf[1] = 0x02;
-		/* iWriteRegI2C(buf , 2, STROBE_DEVICE_ID); */
-		LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
-	} else {
-		int val;
+    if(g_duty<0)
+        g_duty=0;
+    else if(g_duty>16)
+        g_duty=16;
+	
+  if(g_duty < 1) //if(g_duty<=2)
+  {
+  		mt_set_gpio_mode(FLASH_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(FLASH_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(FLASH_ENABLE_PIN,GPIO_OUT_ZERO);
+		mt_set_gpio_mode(TORCH_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(TORCH_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(TORCH_ENABLE_PIN,GPIO_OUT_ONE);
+   
+        buf[0]=7;
+        buf[1]=0x8F;        // 200 ma
+    
+        LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
+		buf[0]=1;
+        buf[1]=6;  //enable software  torch  mode
+   										
+        LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
 
-		val = (g_duty - 1);
-		buf[0] = 9;
-		buf[1] = val;
-		/* iWriteRegI2C(buf , 2, STROBE_DEVICE_ID); */
-		LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
+  }
+  else
+  {
+  		mt_set_gpio_mode(FLASH_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(FLASH_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(FLASH_ENABLE_PIN,GPIO_OUT_ONE);
+		mt_set_gpio_mode(TORCH_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(TORCH_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(TORCH_ENABLE_PIN,GPIO_OUT_ZERO);
+	
+      buf[0]=6;
+	  buf[1]=0x53;         // 1 a
+												
+	  LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
 
-		buf[0] = 10;
-		buf[1] = 0x03;
-		/* iWriteRegI2C(buf , 2, STROBE_DEVICE_ID); */
-		LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
-	}
-	PK_DBG(" FL_Enable line=%d\n", __LINE__);
+	 buf[0]=1;
+     buf[1]=7;  //enable software  flash  mode
+												
+     LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
+	 
+  }
+	PK_DBG(" FL_Enable line=%d\n",__LINE__);
 
-	readReg(0);
-	readReg(1);
-	readReg(6);
-	readReg(8);
-	readReg(9);
-	readReg(0xa);
-	readReg(0xb);
+ //   readReg(0);
+//	readReg(1);
+//	readReg(6);
+//	readReg(8);
+//	readReg(9);
+//	readReg(0xa);
+//	readReg(0xb);
 
-	return 0;
+    return 0;
 }
-
-
 
 int FL_Disable(void)
 {
-	char buf[2];
-
-/* ///////////////////// */
-	buf[0] = 10;
-	buf[1] = 0x00;
-	/* iWriteRegI2C(buf , 2, STROBE_DEVICE_ID); */
+		char buf[2];
+	printk("FL_Disable---\n");
+///////////////////////
+     buf[0]= 1;
+	 buf[1]=0x00;
+	//iWriteRegI2C(buf , 2, STROBE_DEVICE_ID);
 	LM3642_write_reg(LM3642_i2c_client, buf[0], buf[1]);
-	PK_DBG(" FL_Disable line=%d\n", __LINE__);
-	return 0;
+	
+		mt_set_gpio_mode(IC_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(IC_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(IC_ENABLE_PIN,GPIO_OUT_ZERO);
+		mt_set_gpio_mode(FLASH_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(FLASH_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(FLASH_ENABLE_PIN,GPIO_OUT_ZERO);
+		mt_set_gpio_mode(TORCH_ENABLE_PIN, GPIO_MODE_00);
+		mt_set_gpio_dir(TORCH_ENABLE_PIN,GPIO_DIR_OUT);
+		mt_set_gpio_out(TORCH_ENABLE_PIN,GPIO_OUT_ZERO);
+
+
+	PK_DBG(" FL_Disable line=%d\n",__LINE__);
+    return 0;
 }
 
 int FL_dim_duty(kal_uint32 duty)
@@ -354,6 +377,7 @@ int FL_dim_duty(kal_uint32 duty)
 
 int FL_Init(void)
 {
+	#if 0
 	int regVal0;
 	char buf[2];
 
@@ -399,7 +423,7 @@ int FL_Init(void)
     */
 
 
-
+#endif
 
 /*	PK_DBG(" FL_Init line=%d\n", __LINE__); */
 	return 0;
