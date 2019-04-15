@@ -470,15 +470,15 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 
 			mdelay(20);
 		} else if (currSensorName
-			   && (0 == strcmp(SENSOR_DRVNAME_T4KA3_MIPI_RAW, currSensorName))) {
+			   && (0 == strcmp(SENSOR_DRVNAME_T4KA3_MIPI_RAW, currSensorName))&&(pinSetIdx ==0)) {
 				   				   
-/* what is whis... from stok*/
+/* what is whis... from stok
 					if(pinSetIdx ==1)
 					{
 						printk("main camera will be on in sub checking\n");
 						return 0;
 					}
-
+*/
 			if (GPIO_CAMERA_INVALID != pinSet[1][IDX_PS_CMPDN])
 				mtkcam_gpio_set(1, CAMPDN,
 						pinSet[1][IDX_PS_CMPDN + IDX_PS_OFF]);
@@ -523,8 +523,6 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 				     VCAMIO);
 				goto _kdCISModulePowerOn_exit_;
 			}
-
-	
 			/* AF_VCC */
 			if (TRUE != _hwPowerOnCnt(VCAMAF, VOL_2800, mode_name)) {
 				PK_DBG
@@ -549,15 +547,15 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 			mdelay(5);
 			
 		} else if (currSensorName
-			   && (0 == strcmp(SENSOR_DRVNAME_OV5670_MIPI_RAW, currSensorName))) {
+			   && (0 == strcmp(SENSOR_DRVNAME_OV5670_MIPI_RAW, currSensorName))&&(pinSetIdx ==1) ) {
 
-/* what is whis... from stok*/
+/* what is whis... from stok
 					if(pinSetIdx ==0)
 					{
 						printk("main camera will be on in sub checking\n");
 						return 0;
 					}
-			
+*/			
 			if (GPIO_CAMERA_INVALID != pinSet[1-pinSetIdx][IDX_PS_CMRST]){
 				mtkcam_gpio_set(1-pinSetIdx, CAMRST,
 						pinSet[1-pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);			
@@ -963,10 +961,9 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 				mtkcam_gpio_set(pinSetIdx, CAMRST,
 						pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);
 			}
-
 			ISP_MCLK1_EN(0);
-
 			mtkcam_gpio_set(pinSetIdx, CAMLDO, 0);
+		
 			if (TRUE != _hwPowerDownCnt(VCAMD, mode_name)) {
 				PK_DBG
 				    ("[CAMERA SENSOR] Fail to OFF core power (VCAM_D), power id = %d\n",

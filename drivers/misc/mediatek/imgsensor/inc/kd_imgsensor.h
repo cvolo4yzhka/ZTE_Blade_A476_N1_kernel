@@ -112,12 +112,10 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 *
 ********************************************************************************/
 /* SENSOR CHIP VERSION */
-/*T4KA3*/
+/*A476*/
 #define T4KA3MIPI_SENSOR_ID                     0x1490
-#define T4KA3OFMIPI_SENSOR_ID                   0x1491
-#define T4KA3SUBMIPI_SENSOR_ID                  0x1492
-#define T4KA3COSMIPI_SENSOR_ID                  0x1493
-/*T4KA3*/
+#define OV5670MIPI_SENSOR_ID                    0x5670
+/*A476*/
 /*IMX*/
 #define IMX362_SENSOR_ID                        0x0362
 #define IMX338_SENSOR_ID                        0x0338
@@ -157,8 +155,6 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 #define OV8825_SENSOR_ID                        0x8825
 #define OV7675_SENSOR_ID                        0x7673
 #define OV5693_SENSOR_ID                        0x5690
-#define OV5670MIPI_SENSOR_ID                    0x5670
-#define OV5670MIPI_SENSOR_ID_2                  (0x5670+010000)
 #define OV5671MIPI_SENSOR_ID                    0x5671
 #define OV5650_SENSOR_ID                        0x5651
 #define OV5650MIPI_SENSOR_ID                    0x5651
@@ -285,7 +281,6 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 /*Panasoic*/
 #define MN34152_SENSOR_ID                       0x01
 /*Toshiba*/
-#define T4KA7_SENSOR_ID                         0x2c30
 /*Others*/
 #define SHARP3D_SENSOR_ID                       0x003d
 #define T8EV5_SENSOR_ID                         0x1011
@@ -293,12 +288,10 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 /* CAMERA DRIVER NAME */
 #define CAMERA_HW_DEVNAME                       "kd_camera_hw"
 /* SENSOR DEVICE DRIVER NAME */
-/*T4KA3*/
+/*A476*/
 #define SENSOR_DRVNAME_T4KA3_MIPI_RAW           "t4ka3mipiraw"
-#define SENSOR_DRVNAME_T4KA3OF_MIPI_RAW         "t4ka3ofmipiraw"
-#define SENSOR_DRVNAME_T4KA3COS_MIPI_RAW        "t4ka3cosmipiraw"
-#define SENSOR_DRVNAME_T4KA3_MIPI_RAW_SUB       "t4ka3mipirawsub"
-/*T4KA3*/
+#define SENSOR_DRVNAME_OV5670_MIPI_RAW          "ov5670mipiraw"
+/*A476*/
 /*IMX*/
 #define SENSOR_DRVNAME_IMX362_MIPI_RAW          "imx362mipiraw"
 #define SENSOR_DRVNAME_IMX338_MIPI_RAW          "imx338mipiraw"
@@ -337,8 +330,6 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 #define SENSOR_DRVNAME_OV8825_MIPI_RAW          "ov8825mipiraw"
 #define SENSOR_DRVNAME_OV7675_YUV               "ov7675yuv"
 #define SENSOR_DRVNAME_OV5693_MIPI_RAW          "ov5693mipi"
-#define SENSOR_DRVNAME_OV5670_MIPI_RAW          "ov5670mipiraw"
-#define SENSOR_DRVNAME_OV5670_MIPI_RAW_2        "ov5670mipiraw2"
 #define SENSOR_DRVNAME_OV5671_MIPI_RAW          "ov5671mipiraw"
 #define SENSOR_DRVNAME_OV5647MIPI_RAW           "ov5647mipiraw"
 #define SENSOR_DRVNAME_OV5645_MIPI_YUV          "ov5645_mipi_yuv"
@@ -431,7 +422,6 @@ NSFeature :  : RAWSensorInfo < _id >  :  : getFlickerPara \
 /*Panasoic*/
 #define SENSOR_DRVNAME_MN34152_MIPI_RAW         "mn34152mipiraw"
 /*Toshiba*/
-#define SENSOR_DRVNAME_T4KA7_MIPI_RAW           "t4ka7mipiraw"
 /*Others*/
 #define SENSOR_DRVNAME_SHARP3D_MIPI_YUV         "sharp3dmipiyuv"
 #define SENSOR_DRVNAME_T8EV5_YUV                "t8ev5_yuv"

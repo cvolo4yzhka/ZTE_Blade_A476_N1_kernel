@@ -163,7 +163,7 @@ static imgsensor_struct imgsensor = {
 	.test_pattern = KAL_FALSE,		//test pattern mode or not. KAL_FALSE for in test pattern mode, KAL_TRUE for normal output
 	.current_scenario_id = MSDK_SCENARIO_ID_CAMERA_PREVIEW,//current scenario id
 	.ihdr_en = 0, //sensor need support LE, SE with HDR feature
-	.i2c_write_id = 0x6c,//record current sensor's i2c write id
+	.i2c_write_id = 0x20//6c,//record current sensor's i2c write id
 };
 
 

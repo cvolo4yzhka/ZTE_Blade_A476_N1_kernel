@@ -26,7 +26,7 @@
 
 
 #define AF_DRVNAME "DW9718AF_DRV"
-#define AF_I2C_SLAVE_ADDR        0x18
+#define AF_I2C_SLAVE_ADDR        0x1a //0x18
 
 #define AF_DEBUG
 #ifdef AF_DEBUG
