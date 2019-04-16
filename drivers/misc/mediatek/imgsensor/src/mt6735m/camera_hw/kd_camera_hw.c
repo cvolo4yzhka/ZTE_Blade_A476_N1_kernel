@@ -929,7 +929,7 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 			/* VCAM_D */
 			if (TRUE != _hwPowerDownCnt(VCAMD, mode_name)) {
 				PK_DBG
-				    ("[CAMERA SENSOR] Fail to OFF core power (VCAM_D), power id = %d\n",
+				    ("[CAMERA SENSOR] Fail to OFF core power (SUB_VCAM_D), power id = %d\n",
 				     VCAMD);
 				goto _kdCISModulePowerOn_exit_;
 			}
