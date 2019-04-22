@@ -165,11 +165,12 @@ memory@00000000 {
 	tpd-resolution = <720 1280>;
 	use-tpd-button = <1>;
 	tpd-key-num = <3>;
-	tpd-key-local= <158 172 139 0>;
+	tpd-key-local= <158 172 580 0>;
+	/* BACK-158 HOME-172 MENU-139 APP_SWITCH-580*/
 	tpd-key-dim-local = <150 1380 20 40 360 1380 20 40 570 1380 20 40 0 0 0 0>;
 	tpd-max-touch-num = <10>;
 	tpd-filter-enable = <1>;
-	tpd-filter-pixel-density = <93>;
+	tpd-filter-pixel-density = <124>;
 	tpd-filter-custom-prameters = <0 0 0 0 0 0 0 0 0 0 0 0>;
 	tpd-filter-custom-speed = <0 0 0>;
 	pinctrl-names = "default", "state_eint_as_int", "state_eint_output0", "state_eint_output1",
