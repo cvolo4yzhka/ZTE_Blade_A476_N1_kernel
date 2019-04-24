@@ -21,17 +21,20 @@
 
 /* Battery Temperature Protection */
 #define MTK_TEMPERATURE_RECHARGE_SUPPORT
-#define MAX_CHARGE_TEMPERATURE  50
-#define MAX_CHARGE_TEMPERATURE_MINUS_X_DEGREE	47
-#define MIN_CHARGE_TEMPERATURE  0
-#define MIN_CHARGE_TEMPERATURE_PLUS_X_DEGREE	6
+#define MAX_CHARGE_TEMPERATURE  55
+#define MAX_CHARGE_TEMPERATURE_MINUS_X_DEGREE	52
+#define MIN_CHARGE_TEMPERATURE  -10
+#define MIN_CHARGE_TEMPERATURE_PLUS_X_DEGREE	-7
 #define ERR_CHARGE_TEMPERATURE  0xFF
+/*Battery Voltage Protection   */
+#define MTK_VOLTAGE_RECHARGE_SUPPORT 
+#define RECOVERY_CHARGING_VOLTAGE      6000								 
 
 /* Linear Charging Threshold */
 #define V_PRE2CC_THRES 3400
 #define V_CC2TOPOFF_THRES		4050
-#define RECHARGING_VOLTAGE      4110
-#define CHARGING_FULL_CURRENT    100
+#define RECHARGING_VOLTAGE      4250
+#define CHARGING_FULL_CURRENT    200
 
 /* Charging Current Setting */
 #define USB_CHARGER_CURRENT_SUSPEND			0
@@ -52,6 +55,7 @@
 #define BATTERY_AVERAGE_SIZE 30
 
 /* charger error check */
+#define BAT_LOW_TEMP_PROTECT_ENABLE																							 
 #define V_CHARGER_ENABLE 0				/* 1:ON , 0:OFF	*/
 #define V_CHARGER_MAX 6500				/* 6.5 V	*/
 #define V_CHARGER_MIN 4400				/* 4.4 V	*/
@@ -61,6 +65,8 @@
 #define NPERCENT_TRACKING_TIME 20	/* 20 second	*/
 #define SYNC_TO_REAL_TRACKING_TIME 60	/* 60 second	*/
 #define V_0PERCENT_TRACKING							3450 /*3450mV	*/
+//#define CUST_SYSTEM_OFF_VOLTAGE (3300)
+//#define SYSTEM_OFF_VOLTAGE CUST_SYSTEM_OFF_VOLTAGE	
 
 /* Battery Notify */
 #define BATTERY_NOTIFY_CASE_0001_VCHARGER
@@ -71,7 +77,7 @@
 //#define BATTERY_NOTIFY_CASE_0005_TOTAL_CHARGINGTIME
 */
 /* High battery support */
-/*#define HIGH_BATTERY_VOLTAGE_SUPPORT*/
+#define HIGH_BATTERY_VOLTAGE_SUPPORT
 
 /* JEITA parameter */
 /*#define MTK_JEITA_STANDARD_SUPPORT*/
@@ -117,5 +123,6 @@
 #endif
 
 #define MTK_PLUG_OUT_DETECTION
+#define CHARGING_HOST_SUPPORT							 
 
 #endif /* _CUST_BAT_H_ */
