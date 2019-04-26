@@ -591,7 +591,7 @@ static int bq24158_driver_probe(struct i2c_client *client, const struct i2c_devi
     //---------------------
   //  bq24158_hw_init();
 
-    bq24158_reg_config_interface(0x06,0x7a); // ISAFE = 1050mA, VSAFE = 4.4V
+//    bq24158_reg_config_interface(0x06,0x7a); // ISAFE = 1050mA, VSAFE = 4.4V
     bq24158_dump_register();
     chargin_hw_init_done = KAL_TRUE;
 	
