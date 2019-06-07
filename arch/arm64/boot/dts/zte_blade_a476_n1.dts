@@ -168,7 +168,7 @@ memory@00000000 {
 	tpd-key-local= <158 172 580 0>;
 	/* BACK-158 HOME-172 MENU-139 APP_SWITCH-580*/
 	tpd-key-dim-local = <150 1380 20 40 360 1380 20 40 570 1380 20 40 0 0 0 0>;
-	tpd-max-touch-num = <10>;
+	tpd-max-touch-num = <5>;
 	tpd-filter-enable = <1>;
 	tpd-filter-pixel-density = <124>;
 	tpd-filter-custom-prameters = <0 0 0 0 0 0 0 0 0 0 0 0>;

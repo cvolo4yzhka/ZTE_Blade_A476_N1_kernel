@@ -37,7 +37,7 @@ static void ft5x0x_power(bool bOn)
 /***********************************************
 //	GET PANEL PRESSURE STSTE
 */
-#define TPD_SUPPORT_POINTS	2
+#define TPD_SUPPORT_POINTS	5
 struct touch_info
 {
 	int y[TPD_SUPPORT_POINTS];
