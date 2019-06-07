@@ -31,7 +31,7 @@
 
 #define TMD2771_DEV_NAME     "TMD2771"
 /*----------------------------------------------------------------------------*/
-#define APS_TAG                  "[ALS/PS] "
+#define APS_TAG                  "[ALS/PS/TMD2771] "
 #define APS_FUN(f)               pr_debug(APS_TAG"%s\n", __func__)
 #define APS_ERR(fmt, args...)    pr_err(APS_TAG"%s %d : "fmt, __func__, __LINE__, ##args)
 #define APS_LOG(fmt, args...)    pr_debug(APS_TAG fmt, ##args)
