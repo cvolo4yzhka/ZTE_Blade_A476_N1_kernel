@@ -48,6 +48,7 @@ Module.symvers
 /System.map
 /Module.markers
 out/
+out32/
 #
 # Debian directory (make deb-pkg)
 #
