@@ -1437,7 +1437,7 @@ static void hwmsen_late_resume(struct early_suspend *h)
 
 int hwmsen_msensor_remove(struct platform_device *pdev)
 {
-	int err = 0;
+//	int err = 0;
 	int i = 0;
 
 	for (i = 0; i < MAX_CHOOSE_G_NUM; i++) {
