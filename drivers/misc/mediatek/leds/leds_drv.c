@@ -664,7 +664,7 @@ static int mt65xx_leds_probe(struct platform_device *pdev)
 				g_leds_data[i] = NULL;
 				continue;
 			}
-			gpio_direction_output(cust_led_list[i].data, 1);
+			gpio_direction_output(cust_led_list[i].data, 0);
 			gpio_request(cust_led_list[i].data, cust_led_list[i].name);
 			gpio_export(cust_led_list[i].data, false);
 		}
