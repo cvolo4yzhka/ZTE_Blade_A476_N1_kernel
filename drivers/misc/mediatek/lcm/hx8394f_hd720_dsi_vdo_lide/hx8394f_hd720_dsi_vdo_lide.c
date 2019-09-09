@@ -244,10 +244,10 @@ static void lcm_get_params(LCM_PARAMS *params)
 
 	#if 1
 		params->dsi.clk_lp_per_line_enable 		= 0;
-		params->dsi.esd_check_enable 			= 0;//tmp to 0? fix it lexx
+		params->dsi.esd_check_enable 			= 0;//tmp to 0? fix it lexx in N1 not work
 		params->dsi.customization_esd_check_enable 	= 1;
 		params->dsi.lcm_esd_check_table[0].cmd          = 0x09;
-		params->dsi.lcm_esd_check_table[0].count        = 3;/*2 ? c n1 only may be...*/
+		params->dsi.lcm_esd_check_table[0].count        = 3;
 		params->dsi.lcm_esd_check_table[0].para_list[0] = 0x80;
 		params->dsi.lcm_esd_check_table[0].para_list[1] = 0x73;
 		params->dsi.lcm_esd_check_table[0].para_list[2] = 0x06;//04
