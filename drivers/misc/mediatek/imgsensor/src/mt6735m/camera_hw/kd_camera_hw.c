@@ -45,7 +45,7 @@
 #endif
 
 
-#if 1 // !defined(CONFIG_MTK_LEGACY)
+#if 1// !defined(CONFIG_MTK_LEGACY)
 
 /* GPIO Pin control*/
 struct platform_device *cam_plt_dev = NULL;

@@ -15,6 +15,14 @@ memory@00000000 {
 		#size-cells = <1>;
 		ranges = <0 0 0 0xffffffff>;
 
+		MALI@0x13040000 {
+			compatible = "arm,malit720", "arm,mali-t72x", "arm,malit7xx", "arm,mali-midgard";
+			reg = <0x13040000 0x4000>;
+			interrupts = <0 212 0x8>, <0 211 0x8>, <0 210 0x8>;
+			interrupt-names = "JOB", "MMU", "GPU";
+			clock-frequency = <550000000>;
+		};
+
 		MTKFB@5e200000 {
 			compatible = "mediatek,MTKFB";
 			reg = <0x7F000000 0x1000000>;
