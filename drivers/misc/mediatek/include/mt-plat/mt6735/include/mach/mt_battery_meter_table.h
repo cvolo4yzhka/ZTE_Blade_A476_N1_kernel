@@ -164,13 +164,10 @@ BATTERY_PROFILE_STRUCT battery_profile_t0[] = {
 	{100, 3568},
 	{100, 3568},
 	{100, 3568} 
-
 };      
         
 /* T1 0C */
-BATTERY_PROFILE_STRUCT battery_profile_t1[] =
-{
-	
+BATTERY_PROFILE_STRUCT battery_profile_t1[] = {
 	{0	,    4374},
 	{2	,    4353},
 	{3	,    4332},
@@ -244,12 +241,10 @@ BATTERY_PROFILE_STRUCT battery_profile_t1[] =
 	{100,    3411},
 	{100,    3411},
 	{100,    3411} 
-
 };           
 
 // T2 25C
-BATTERY_PROFILE_STRUCT battery_profile_t2[] =
-{
+BATTERY_PROFILE_STRUCT battery_profile_t2[] = {
 	
 	{0 	,	 4382 }, 
 	{1 	,	 4364 }, 
@@ -324,7 +319,6 @@ BATTERY_PROFILE_STRUCT battery_profile_t2[] =
 	{97	,	 3588 }, 
 	{99	,	 3504 }, 
 	{100	,	 3375 }  
-
 };     
 
 // T3 50C
@@ -403,7 +397,6 @@ BATTERY_PROFILE_STRUCT battery_profile_t3[] =
 	{97 ,	 3605},   
 	{98 ,	 3534},   
 	{100,	 3432}	  
-
 };           
 
 // battery profile for actual temperature. The size should be the same as T1, T2 and T3

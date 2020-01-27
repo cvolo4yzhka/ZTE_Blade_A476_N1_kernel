@@ -3,7 +3,8 @@
 export ARCH=arm
 #set cross compiller path
 #export CROSS_COMPILE=~/Kernel/toolchain/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
-export CROSS_COMPILE=~/Kernel/toolchain/arm-eabi-4.8/bin/arm-eabi-
+#export CROSS_COMPILE=~/Kernel/toolchain/arm-linux-androideabi-4.9/bin/arm-eabi-
+export CROSS_COMPILE=~/toolchain/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 #set directory for build output
 export  KBUILD_OUTPUT=out32
 #set defconfig
