@@ -507,17 +507,19 @@ static void hw_bc11_done(void)
 	bc11_set_register_value(PMIC_RG_USBDL_SET,0x0);//force leave USBDL mode
 	bc11_set_register_value(PMIC_RG_USBDL_RST,0x1);//force leave USBDL mode
 
-    bq24158_reg_config_interface(0x00,0x80);//0xC0);	//kick chip watch dog
+//    bq24158_reg_config_interface(0x00,0x80);//0xC0);	//kick chip watch dog
 
 	#if defined(HIGH_BATTERY_VOLTAGE_SUPPORT)
         bq24158_reg_config_interface(0x06,0x7a); // ISAFE = 1250mA, VSAFE = 4.4V
+        bq24158_reg_config_interface(0x02,0xb4); // Battery regulator voltage 4.4V
     #else
-        bq24158_reg_config_interface(0x06,0x70);
+        bq24158_reg_config_interface(0x06,0x70); //Isafe = 1250mA, Vsafe = 4.2V
+        bq24158_reg_config_interface(0x02,0x8e); // Battery regulator voltage 4.2V
 	#endif
 	    
-//    bq24158_reg_config_interface(0x00,0x80);	//kick chip watch dog, disable STAT pin funtion (sanford.lin)
+    bq24158_reg_config_interface(0x00,0x80);	//kick chip watch dog, disable STAT pin funtion (sanford.lin)
     bq24158_reg_config_interface(0x01,0xb8);	//TE=1, CE=0, HZ_MODE=0, OPA_MODE=0
-    bq24158_reg_config_interface(0x05,0x03);
+    bq24158_reg_config_interface(0x05,0x03);	//Special Changer voltage - 4.44V
 
 	if ( !charging_init_flag ) {
 		bq24158_reg_config_interface(0x04,0x1a); //146mA
